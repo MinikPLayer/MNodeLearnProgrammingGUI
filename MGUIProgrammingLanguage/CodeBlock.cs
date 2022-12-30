@@ -49,7 +49,7 @@ public class CodeBlock : Drawable
     {
         var ret = _code;
         for (var i = 0; i < _parameters.Count; i++)
-            ret = ret.ReplaceVariable($"$p{i}", _parameters[i].ValueString);
+            ret = ret.ReplaceVariable($"$p{i}", _parameters[i].Value);
 
         ret = prefix + ret.Replace("\n", "\n" + prefix);
         return Children.Aggregate(ret, (current, c) => current + ("\n" + c.GetCode(prefix + "\t")));

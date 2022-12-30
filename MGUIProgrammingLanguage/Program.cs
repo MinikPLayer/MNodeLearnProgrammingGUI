@@ -30,39 +30,32 @@ static class Program
         var importsStr = imports.Aggregate("", (current, import) => current + (import + "\n"));
         return importsStr + "\n" + ret;
     }
+
+    static void UpdateCode()
+    {
+        
+    }
+
+    static void GenerateTestProgram()
+    {
+        var countParam = Parameter.Output();
+        mainBlock = Blocks.Assignment(countParam, 0);
+        var nextBlock = mainBlock.ConnectNextBlock(Blocks.Print("START"));
+        var whileLoopBlock = nextBlock.ConnectNextBlock(Blocks.WhileLoop(countParam < 5));
+        {
+            whileLoopBlock.Children.Add(Blocks.Assignment(countParam, countParam + 1));
+            whileLoopBlock.Children.Add(Blocks.Print(Parameter.Input("Loop nr") + countParam.AsString()));
+            var readParam = Parameter.Output();
+            whileLoopBlock.Children.Add(Blocks.ReadInput(readParam,"Input: "));
+            whileLoopBlock.Children.Add(Blocks.Print(readParam));
+            whileLoopBlock.Children.Add(Blocks.Sleep(1.0f));
+        }
+        whileLoopBlock.ConnectNextBlock(Blocks.Print("END"));
+    }
     
     static void Main(string[] args)
     {
-        // mainBlock = new CodeBlock("Read user input", "$out1 = input($var1)",
-        //     new List<Parameter>
-        //     {
-        //         Parameter<string>.CreateInputParameter("$var1", "Input:"),
-        //         Parameter<string>.CreateOutputParameter($"$out1", "out")
-        //     }
-        // );
-        //
-        // mainBlock.ConnectNextBlock(new CodeBlock("Print Hello world", "print($var1)",
-        //     new List<Parameter> { Parameter<string>.CreateInputParameter("$var1", "Hello world!", mainBlock.parameters[1]) }));
-        //
-
-        // mainBlock = BlocksDefinitions.WhileLoopBlock(Parameter<bool>.CreateInputParameter("", true));
-        // {
-        //     var readParam = Parameter<string>.CreateOutputParameter("$var", "out");
-        //     mainBlock.children.Add(BlocksDefinitions.ReadInputBlock(readParam, Parameter<string>.CreateInputParameter("", "Enter your name: ")));
-        //     mainBlock.children.Add(BlocksDefinitions.PrintBlock(Parameter<string>.CreateInputParameter("", "", inputParameter: readParam)));
-        // }
-        
-        var readParam = Parameter.Output();
-        mainBlock = BlocksDefinitions.Assignment(readParam, Parameter.Input(0));
-        var whileLoopBlock = mainBlock.ConnectNextBlock(BlocksDefinitions.WhileLoop(
-            Parameter.Operation(readParam, OperationParameter.Operations.LessThan, Parameter.Input(5))));
-        {
-            whileLoopBlock.Children.Add(BlocksDefinitions.Assignment(readParam,
-                Parameter.Operation(readParam, OperationParameter.Operations.Add, Parameter.Input(1))));
-            whileLoopBlock.Children.Add(BlocksDefinitions.Print(readParam));
-            whileLoopBlock.Children.Add(BlocksDefinitions.Sleep(Parameter.Input(1.0)));
-        }
-
+        GenerateTestProgram();
 
         var window = new RenderWindow(new VideoMode(1280, 720), "MGUI");
         window.Closed += WindowOnClosed;
@@ -113,7 +106,8 @@ static class Program
         var pythonPath = GetPythonPath();
         _pythonProcess = Process.Start(pythonPath, path);
     }
-    
+
+    private static string _tempPath = Path.Combine(Path.GetTempPath(), Guid.NewGuid().ToString());
     private static void WindowOnKeyPressed(object? sender, KeyEventArgs e)
     {
         if (e.Code == Keyboard.Key.P)
@@ -128,11 +122,9 @@ static class Program
 
             var code = GetCode();
             Console.WriteLine("Executing code: \n" + code);
-            var tempDir = Path.GetTempPath();
-            var tempPath = Path.Combine(tempDir, new Guid().ToString());
-            File.WriteAllText(tempPath, code);
+            File.WriteAllText(_tempPath, code);
             
-            StartProcess(tempPath);
+            StartProcess(_tempPath);
         }
     }
 

@@ -8,7 +8,7 @@ public class OperationParameter : Parameter
         LessOrEqual,
         GreaterThan = '>',
         GreaterOrEqual,
-        Equals,
+        IsEqual,
         Add = '+',
         Subtract = '-',
         Multiply = '*',
@@ -21,7 +21,7 @@ public class OperationParameter : Parameter
     {
         return op switch
         {
-            Operations.Equals => "==",
+            Operations.IsEqual => "==",
             Operations.LessOrEqual => "<=",
             Operations.GreaterOrEqual => ">=",
             Operations.Power => "**",

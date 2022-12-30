@@ -1,6 +1,6 @@
 namespace MGUIProgrammingLanguage;
 
-public static class BlocksDefinitions
+public static class Blocks
 {
     public static CodeBlock Print(Parameter printData)
     {
@@ -9,7 +9,7 @@ public static class BlocksDefinitions
 
     public static CodeBlock ReadInput(Parameter outputParameter, Parameter? inputHintParameter = null)
     {
-        inputHintParameter ??= Parameter.Input("Input: ");
+        inputHintParameter ??= Parameter.Input("");
         return new CodeBlock("Read input", "$p0 = input($p1)", new List<Parameter> { outputParameter, inputHintParameter });
     }
 

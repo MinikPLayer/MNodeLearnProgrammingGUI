@@ -8,20 +8,21 @@ public class Parameter
     public Parameter? InputParameter = null;
     private string _value;
     private bool _isInput;
-    private string _typeName;
+    protected string TypeName;
 
     public string Value
     {
         set => _value = value;
-        get => _isInput && InputParameter != null ? InputParameter.Value : _GetValue();
-    }
-    
-    public string ValueString
-    {
         get
         {
-            var value = Value;
-            return _isInput && InputParameter is null && _typeName == "String" ? $"\"{value}\"" : value;
+            if (!_isInput) 
+                return _value;
+
+            if (InputParameter != null) 
+                return InputParameter.Value;
+            
+            var value = _GetValue();
+            return TypeName == "String" ? $"\"{value}\"" : value;
         }
     }
 
@@ -35,13 +36,13 @@ public class Parameter
     {
         return typeof(T).Name;
     }
-    
+
     protected Parameter(bool isInput, string value = "", Parameter? inputParameter = null, string typeName = "")
     {
         this._value = value;
         this.InputParameter = inputParameter;
         this._isInput = isInput;
-        this._typeName = typeName;
+        this.TypeName = typeName;
     }
 
     public static Parameter Input<T>(T value, string typeName = "") =>
@@ -55,4 +56,19 @@ public class Parameter
 
     public static Parameter Operation(Parameter p1, OperationParameter.Operations op, Parameter p2) =>
         new OperationParameter(p1, op, p2);
+    
+    
+    public static Parameter operator +(Parameter p1, Parameter p2) => p1.Add(p2);
+    public static Parameter operator -(Parameter p1, Parameter p2) => p1.Subtract(p2);
+    public static Parameter operator *(Parameter p1, Parameter p2) => p1.Multiply(p2);
+    public static Parameter operator /(Parameter p1, Parameter p2) => p1.Divide(p2);
+    public static Parameter operator >(Parameter p1, Parameter p2) => p1.GreaterThan(p2);
+    public static Parameter operator >=(Parameter p1, Parameter p2) => p1.GreaterOrEqual(p2);
+    public static Parameter operator <(Parameter p1, Parameter p2) => p1.LessThan(p2);
+    public static Parameter operator <=(Parameter p1, Parameter p2) => p1.LessOrEqual(p2);
+    public static Parameter operator %(Parameter p1, Parameter p2) => p1.Modulo(p2);
+
+    public static implicit operator Parameter(string value) => Input(value);
+    public static implicit operator Parameter(int value) => Input(value);
+    public static implicit operator Parameter(float value) => Input(value);
 }
